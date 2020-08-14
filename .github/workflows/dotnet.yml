@@ -2,10 +2,10 @@ name: CI
 
 env:
   GITHUB_FEED: https://nuget.pkg.github.com/EmptyBucket/index.json
-  GITHUB_KEY: ${{ secrets.INTERVALS_GITHUB_PAT }}
+  GITHUB_KEY: ${{ secrets.REPOSITORIES_GITHUB_PAT }}
 
   NUGET_FEED: https://api.nuget.org/v3/index.json
-  NUGET_KEY: ${{ secrets.INTERVALS_NUGET_PAT }}
+  NUGET_KEY: ${{ secrets.REPOSITORIES_NUGET_PAT }}
 
 on:
   push:
@@ -26,7 +26,8 @@ jobs:
 
     - name: Create Release NuGet package
       run: |
-        dotnet pack -c Release -o packages src/Modules
+        dotnet pack -c Release -o packages src/Repositories.Abstractions
+        dotnet pack -c Release -o packages src/Repositories.Ef
       
     - name: Push to GitHub Feed
       run: |
