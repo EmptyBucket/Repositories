@@ -4,7 +4,7 @@ Library for working with repositories and unit of work
 * https://www.nuget.org/packages/ap.Repository.Abstractions/
 * https://www.nuget.org/packages/ap.Repository.Ef/
 ## Usage
-```cssharp
+```csharp
 var postgreSettings = new NpgsqlConnectionStringBuilder
     { Host = "localhost", Database = "postgres", Username = "postgres", Password = "postgres" }.ConnectionString;
 var serviceCollection = new ServiceCollection()
