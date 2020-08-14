@@ -1,0 +1,16 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <TargetFramework>net6.0</TargetFramework>
+        <ImplicitUsings>enable</ImplicitUsings>
+        <Nullable>enable</Nullable>
+
+        <PackageId>ap.Repository.Abstractions</PackageId>
+        <Version>1.0.0</Version>
+        <Authors>Alexey Politov</Authors>
+        <PackageDescription>Library for working with repositories and unit of work</PackageDescription>
+        <RepositoryUrl>https://github.com/EmptyBucket/Repositories</RepositoryUrl>
+        <PackageLicenseExpression>MIT</PackageLicenseExpression>
+    </PropertyGroup>
+
+</Project>

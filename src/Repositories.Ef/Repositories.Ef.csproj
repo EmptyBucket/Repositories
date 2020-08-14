@@ -1,0 +1,26 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <TargetFramework>net6.0</TargetFramework>
+        <ImplicitUsings>enable</ImplicitUsings>
+        <Nullable>enable</Nullable>
+        <RootNamespace>Repositories</RootNamespace>
+
+        <PackageId>ap.Repository.Ef</PackageId>
+        <Version>1.0.0</Version>
+        <Authors>Alexey Politov</Authors>
+        <PackageDescription>Library for working with repositories and unit of work</PackageDescription>
+        <RepositoryUrl>https://github.com/EmptyBucket/Repositories</RepositoryUrl>
+        <PackageLicenseExpression>MIT</PackageLicenseExpression>
+    </PropertyGroup>
+
+    <ItemGroup>
+        <ProjectReference Include="..\Repositories.Abstractions\Repositories.Abstractions.csproj"/>
+    </ItemGroup>
+
+    <ItemGroup>
+        <PackageReference Include="Microsoft.EntityFrameworkCore" Version="6.0.4"/>
+        <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="6.0.0"/>
+    </ItemGroup>
+
+</Project>
