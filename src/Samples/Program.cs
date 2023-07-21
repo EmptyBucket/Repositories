@@ -21,13 +21,13 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-﻿using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.Design;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Npgsql;
 using Repositories.Abstractions.Repositories;
 using Repositories.Abstractions.Scopes;
 using Repositories.Exts;
+using Samples;
 
 var postgreSettings = new NpgsqlConnectionStringBuilder
     { Host = "localhost", Database = "postgres", Username = "postgres", Password = "postgres" }.ConnectionString;
@@ -36,7 +36,7 @@ var serviceCollection = new ServiceCollection()
     .AddUnitOfWork()
     .AddEntity<FirstEntity, FooDbContext>()
     .AddEntity<SecondEntity, FooDbContext>();
-var serviceProvider = serviceCollection.BuildServiceProvider().CreateScope().ServiceProvider;
+var serviceProvider = serviceCollection.BuildServiceProvider(true).CreateScope().ServiceProvider;
 
 {
     var firstRepository = serviceProvider.GetRequiredService<IRepository<FirstEntity>>();
@@ -46,6 +46,7 @@ var serviceProvider = serviceCollection.BuildServiceProvider().CreateScope().Ser
 {
     var firstRepositoryFactory = serviceProvider.GetRequiredService<IRepositoryFactory<FirstEntity>>();
     var secondRepositoryFactory = serviceProvider.GetRequiredService<IRepositoryFactory<SecondEntity>>();
+    var dbContextFactory = serviceProvider.GetRequiredService<IDbContextFactory<FooDbContext>>();
     var unitOfWork = serviceProvider.GetRequiredService<IUnitOfWork>();
 
     await unitOfWork.RunAsync(async () =>
@@ -55,67 +56,8 @@ var serviceProvider = serviceCollection.BuildServiceProvider().CreateScope().Ser
 
         await firstRepository.AddAsync(new FirstEntity("second"));
         await secondRepository.AddAsync(new SecondEntity("third"));
+
+        // do something in db context
+        var fooDbContext = dbContextFactory.CreateDbContext();
     });
-}
-
-public class FooDbContext : DbContext
-{
-    public FooDbContext(DbContextOptions<FooDbContext> options) : base(options)
-    {
-    }
-
-    protected override void OnModelCreating(ModelBuilder modelBuilder)
-    {
-        modelBuilder.Entity<FirstEntity>().HasKey(f => f.Id);
-        modelBuilder.Entity<FirstEntity>().Property(f => f.Name);
-
-        modelBuilder.Entity<SecondEntity>().HasKey(f => f.Id);
-        modelBuilder.Entity<SecondEntity>().Property(f => f.Name);
-    }
-}
-
-public class FirstEntity : IEntity<Guid, FirstEntity>
-{
-    private FirstEntity(Guid id, string name)
-    {
-        Id = id;
-        Name = name;
-    }
-
-    public FirstEntity(string name) : this(Guid.NewGuid(), name)
-    {
-    }
-
-    public Guid Id { get; }
-
-    public string Name { get; }
-}
-
-public class SecondEntity : IEntity<Guid, FirstEntity>
-{
-    private SecondEntity(Guid id, string name)
-    {
-        Id = id;
-        Name = name;
-    }
-
-    public SecondEntity(string name) : this(Guid.NewGuid(), name)
-    {
-    }
-
-    public Guid Id { get; }
-
-    public string Name { get; }
-}
-
-public class DesignTimeDbContextFactory : IDesignTimeDbContextFactory<FooDbContext>
-{
-    public FooDbContext CreateDbContext(string[] args)
-    {
-        var postgreSettings = new NpgsqlConnectionStringBuilder
-                { Host = "localhost", Database = "postgres", Username = "postgres", Password = "postgres" }
-            .ConnectionString;
-        var dbContextOptions = new DbContextOptionsBuilder<FooDbContext>().UseNpgsql(postgreSettings).Options;
-        return new FooDbContext(dbContextOptions);
-    }
 }

@@ -22,6 +22,7 @@
 // SOFTWARE.
 
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Internal;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using Repositories.Abstractions.Repositories;
@@ -37,14 +38,21 @@ public static class ServiceCollectionExts
         Action<IServiceProvider, DbContextOptionsBuilder> action, ServiceLifetime lifetime = ServiceLifetime.Scoped)
         where TDbContext : DbContext
     {
+        // registration override IDbContextFactory<TDbContext> below
+        serviceCollection.Add(new ServiceDescriptor(typeof(IDbContextFactory<TDbContext>),
+            typeof(ScopedDbContextFactory<TDbContext>), lifetime));
+
+        // register core services as singleton for resolve in singleton and scoped services
+        serviceCollection.AddSingleton<DbContextFactory<TDbContext>>();
         serviceCollection.AddDbContextFactory<TDbContext>(action);
+
         serviceCollection.Add(new ServiceDescriptor(typeof(IScopeHead<IDbContextScope<TDbContext>>), p =>
         {
-            var dbContextFactory = p.GetRequiredService<IDbContextFactory<TDbContext>>();
+            var dbContextFactory = p.GetRequiredService<DbContextFactory<TDbContext>>();
             var dbContextScope = new DbContextScope<TDbContext>(dbContextFactory);
             return new ScopeHead<IDbContextScope<TDbContext>>(dbContextScope);
         }, lifetime));
-        serviceCollection.Add(new ServiceDescriptor(typeof(IScopeHead<IDbContextScope>),
+        serviceCollection.Add(new ServiceDescriptor(typeof(IScopeHead<IDbContextScope<DbContext>>),
             p => p.GetRequiredService<IScopeHead<IDbContextScope<TDbContext>>>(), lifetime));
 
         return serviceCollection;

@@ -25,34 +25,41 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Repositories.Scopes;
 
-internal class DbContextScope<TDbContext> : Scope<IDbContextScope<TDbContext>>, IDbContextScope<TDbContext>
-	where TDbContext : DbContext
+internal class DbContextScope<TDbContext> : IDbContextScope<TDbContext> where TDbContext : DbContext
 {
-	private readonly IDbContextFactory<TDbContext> _dbContextFactory;
-	private readonly Lazy<TDbContext> _dbContext;
+    private readonly IDbContextFactory<TDbContext> _dbContextFactory;
+    private readonly Lazy<TDbContext> _dbContext;
 
-	public DbContextScope(IDbContextFactory<TDbContext> dbContextFactory, IDbContextScope<TDbContext>? parent = null)
-		: base(parent)
-	{
-		_dbContextFactory = dbContextFactory;
-		_dbContext = new Lazy<TDbContext>(dbContextFactory.CreateDbContext);
-	}
+    public DbContextScope(IDbContextFactory<TDbContext> dbContextFactory, IDbContextScope<TDbContext>? parent = null)
+    {
+        _dbContextFactory = dbContextFactory;
+        _dbContext = new Lazy<TDbContext>(dbContextFactory.CreateDbContext);
+        Parent = parent;
+    }
 
-	public TDbContext DbContext => _dbContext.Value;
+    public IDbContextScope<TDbContext>? Parent { get; }
 
-	protected override IDbContextScope<TDbContext> BeginCore()
-	{
-		return new DbContextScope<TDbContext>(_dbContextFactory, this);
-	}
+    public IDbContextScope<TDbContext>? Child { get; private set; }
 
-	protected override async ValueTask DisposeAsyncCore()
-	{
-		await base.DisposeAsyncCore();
+    public bool IsDisposed { get; private set; }
 
-		if (_dbContext.IsValueCreated)
-		{
-			await _dbContext.Value.SaveChangesAsync().ConfigureAwait(false);
-			await _dbContext.Value.DisposeAsync().ConfigureAwait(false);
-		}
-	}
+    public TDbContext DbContext => _dbContext.Value;
+
+    public IDbContextScope<TDbContext> Begin() => Child = new DbContextScope<TDbContext>(_dbContextFactory, this);
+
+    public async ValueTask DisposeAsync()
+    {
+        if (IsDisposed) return;
+
+        if (Child is not null) await Child.DisposeAsync();
+
+        if (_dbContext.IsValueCreated)
+        {
+            await _dbContext.Value.SaveChangesAsync().ConfigureAwait(false);
+            await _dbContext.Value.DisposeAsync().ConfigureAwait(false);
+        }
+
+        GC.SuppressFinalize(this);
+        IsDisposed = true;
+    }
 }

@@ -28,97 +28,97 @@ using Repositories.Abstractions.Repositories;
 namespace Repositories.Repositories;
 
 internal class Repository<T, TDbContext> : IRepository<T>
-	where T : class, IExprEntity
-	where TDbContext : DbContext
+    where T : class, IExprEntity
+    where TDbContext : DbContext
 {
-	private readonly DbSet<T> _dbSet;
+    private readonly DbSet<T> _dbSet;
 
-	public Repository(TDbContext dbContext)
-	{
-		_dbSet = dbContext.Set<T>();
-	}
+    public Repository(TDbContext dbContext)
+    {
+        _dbSet = dbContext.Set<T>();
+    }
 
-	public async Task<IReadOnlyCollection<T>> GetManyAsync(Expression<Func<T, bool>>? where = null,
-		IEnumerable<Expression<Func<T, object>>>? orderBy = null, int? offset = null, int? count = null,
-		CancellationToken cancellationToken = default)
-	{
-		return await BuildQueryable(where, orderBy, offset, count).ToArrayAsync(cancellationToken);
-	}
+    public async Task<IReadOnlyCollection<T>> GetManyAsync(Expression<Func<T, bool>>? where = null,
+        IEnumerable<Expression<Func<T, object>>>? orderBy = null, int? offset = null, int? count = null,
+        CancellationToken cancellationToken = default)
+    {
+        return await BuildQueryable(where, orderBy, offset, count).ToArrayAsync(cancellationToken);
+    }
 
-	public async Task<T?> FindAsync(Expression<Func<T, bool>>? where = null,
-		IEnumerable<Expression<Func<T, object>>>? orderBy = null, int? offset = null, int? count = null,
-		CancellationToken cancellationToken = default)
-	{
-		return await BuildQueryable(where, orderBy, offset, count).FirstOrDefaultAsync(cancellationToken);
-	}
+    public async Task<T?> FindAsync(Expression<Func<T, bool>>? where = null,
+        IEnumerable<Expression<Func<T, object>>>? orderBy = null, int? offset = null, int? count = null,
+        CancellationToken cancellationToken = default)
+    {
+        return await BuildQueryable(where, orderBy, offset, count).FirstOrDefaultAsync(cancellationToken);
+    }
 
-	public async Task<T> GetAsync(Expression<Func<T, bool>>? where = null,
-		IEnumerable<Expression<Func<T, object>>>? orderBy = null, int? offset = null, int? count = null,
-		CancellationToken cancellationToken = default)
-	{
-		return await BuildQueryable(where, orderBy, offset, count).FirstAsync(cancellationToken);
-	}
+    public async Task<T> GetAsync(Expression<Func<T, bool>>? where = null,
+        IEnumerable<Expression<Func<T, object>>>? orderBy = null, int? offset = null, int? count = null,
+        CancellationToken cancellationToken = default)
+    {
+        return await BuildQueryable(where, orderBy, offset, count).FirstAsync(cancellationToken);
+    }
 
-	public async Task AddAsync(T entity, CancellationToken cancellationToken = default)
-	{
-		await _dbSet.AddAsync(entity, cancellationToken);
-	}
+    public async Task AddAsync(T entity, CancellationToken cancellationToken = default)
+    {
+        await _dbSet.AddAsync(entity, cancellationToken);
+    }
 
-	public async Task AddManyAsync(IReadOnlyCollection<T> entities, CancellationToken cancellationToken = default)
-	{
-		await _dbSet.AddRangeAsync(entities, cancellationToken);
-	}
+    public async Task AddManyAsync(IReadOnlyCollection<T> entities, CancellationToken cancellationToken = default)
+    {
+        await _dbSet.AddRangeAsync(entities, cancellationToken);
+    }
 
-	public Task UpdateAsync(T entity, CancellationToken cancellationToken = default)
-	{
-		_dbSet.Update(entity);
-		return Task.CompletedTask;
-	}
+    public Task UpdateAsync(T entity, CancellationToken cancellationToken = default)
+    {
+        _dbSet.Update(entity);
+        return Task.CompletedTask;
+    }
 
-	public Task UpdateManyAsync(IReadOnlyCollection<T> entities, CancellationToken cancellationToken = default)
-	{
-		_dbSet.UpdateRange(entities);
-		return Task.CompletedTask;
-	}
+    public Task UpdateManyAsync(IReadOnlyCollection<T> entities, CancellationToken cancellationToken = default)
+    {
+        _dbSet.UpdateRange(entities);
+        return Task.CompletedTask;
+    }
 
-	public Task DeleteAsync(T entity, CancellationToken cancellationToken = default)
-	{
-		_dbSet.Remove(entity);
-		return Task.CompletedTask;
-	}
+    public Task DeleteAsync(T entity, CancellationToken cancellationToken = default)
+    {
+        _dbSet.Remove(entity);
+        return Task.CompletedTask;
+    }
 
-	public Task DeleteManyAsync(IReadOnlyCollection<T> entities, CancellationToken cancellationToken = default)
-	{
-		_dbSet.RemoveRange(entities);
-		return Task.CompletedTask;
-	}
+    public Task DeleteManyAsync(IReadOnlyCollection<T> entities, CancellationToken cancellationToken = default)
+    {
+        _dbSet.RemoveRange(entities);
+        return Task.CompletedTask;
+    }
 
-	private IQueryable<T> BuildQueryable(Expression<Func<T, bool>>? where,
-		IEnumerable<Expression<Func<T, object>>>? orderBy, int? offset, int? count)
-	{
-		var queryable = _dbSet.AsQueryable();
+    private IQueryable<T> BuildQueryable(Expression<Func<T, bool>>? where,
+        IEnumerable<Expression<Func<T, object>>>? orderBy, int? offset, int? count)
+    {
+        var queryable = _dbSet.AsQueryable();
 
-		if (where is not null) queryable = queryable.Where(where);
+        if (where is not null) queryable = queryable.Where(where);
 
-		if (orderBy is not null)
-		{
-			var expressions = orderBy.ToArray();
+        if (orderBy is not null)
+        {
+            var expressions = orderBy.ToArray();
 
-			if (expressions.Length > 0)
-			{
-				var orderedQueryable = queryable.OrderBy(expressions.First());
+            if (expressions.Length > 0)
+            {
+                var orderedQueryable = queryable.OrderBy(expressions.First());
 
-				for (var i = 1; i < expressions.Length; i++)
-					orderedQueryable = orderedQueryable.ThenBy(expressions[i]);
+                for (var i = 1; i < expressions.Length; i++)
+                    orderedQueryable = orderedQueryable.ThenBy(expressions[i]);
 
-				queryable = orderedQueryable;
-			}
-		}
+                queryable = orderedQueryable;
+            }
+        }
 
-		if (offset is not null) queryable = queryable.Skip(offset.Value);
+        if (offset is not null) queryable = queryable.Skip(offset.Value);
 
-		if (count is not null) queryable = queryable.Take(count.Value);
+        if (count is not null) queryable = queryable.Take(count.Value);
 
-		return queryable;
-	}
+        return queryable;
+    }
 }

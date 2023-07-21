@@ -22,6 +22,7 @@ var serviceProvider = serviceCollection.BuildServiceProvider().CreateScope().Ser
 {
     var firstRepositoryFactory = serviceProvider.GetRequiredService<IRepositoryFactory<FirstEntity>>();
     var secondRepositoryFactory = serviceProvider.GetRequiredService<IRepositoryFactory<SecondEntity>>();
+    var dbContextFactory = serviceProvider.GetRequiredService<IDbContextFactory<FooDbContext>>();
     var unitOfWork = serviceProvider.GetRequiredService<IUnitOfWork>();
 
     await unitOfWork.RunAsync(async () =>
@@ -31,6 +32,9 @@ var serviceProvider = serviceCollection.BuildServiceProvider().CreateScope().Ser
 
         await firstRepository.AddAsync(new FirstEntity("second"));
         await secondRepository.AddAsync(new SecondEntity("third"));
+
+        // do something in db context
+        var fooDbContext = dbContextFactory.CreateDbContext();
     });
 }
 ```

@@ -27,22 +27,22 @@ namespace Repositories.Abstractions.Repositories;
 
 public interface IExprEntity
 {
-	Expression IdExpr { get; }
+    Expression IdExpr { get; }
 }
 
 public interface IExprEntity<T> : IExprEntity
 {
-	private static Expression<Func<T, object>>? _idExpr;
+    private static Expression<Func<T, object>>? _idExpr;
 
-	new Expression<Func<T, object>> IdExpr { get; }
+    new Expression<Func<T, object>> IdExpr { get; }
 
-	Expression IExprEntity.IdExpr
-	{
-		get
-		{
-			if (_idExpr == null) Interlocked.CompareExchange(ref _idExpr, IdExpr, null);
+    Expression IExprEntity.IdExpr
+    {
+        get
+        {
+            if (_idExpr == null) Interlocked.CompareExchange(ref _idExpr, IdExpr, null);
 
-			return _idExpr;
-		}
-	}
+            return _idExpr;
+        }
+    }
 }

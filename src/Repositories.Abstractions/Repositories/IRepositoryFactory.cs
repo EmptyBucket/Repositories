@@ -25,5 +25,5 @@ namespace Repositories.Abstractions.Repositories;
 
 public interface IRepositoryFactory<T> where T : IExprEntity
 {
-	IRepository<T> Create();
+    IRepository<T> Create();
 }

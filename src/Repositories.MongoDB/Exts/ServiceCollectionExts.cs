@@ -31,17 +31,17 @@ namespace Repositories.Mongo.Exts;
 
 internal static class ServiceCollectionExts
 {
-	public static IServiceCollection AddEntity<T>(this IServiceCollection serviceCollection,
-		IMongoDatabase mongoDatabase, string? collectionName = default,
-		ServiceLifetime lifetime = ServiceLifetime.Scoped)
-		where T : IExprEntity
-	{
-		if (string.IsNullOrEmpty(collectionName)) collectionName = typeof(T).Name;
+    public static IServiceCollection AddEntity<T>(this IServiceCollection serviceCollection,
+        IMongoDatabase mongoDatabase, string? collectionName = default,
+        ServiceLifetime lifetime = ServiceLifetime.Scoped)
+        where T : IExprEntity
+    {
+        if (string.IsNullOrEmpty(collectionName)) collectionName = typeof(T).Name;
 
-		serviceCollection.TryAdd(new ServiceDescriptor(typeof(IMongoCollection<T>),
-			_ => mongoDatabase.GetCollection<T>(collectionName), lifetime));
-		serviceCollection.TryAdd(new ServiceDescriptor(typeof(IRepository<T>), typeof(Repository<T>), lifetime));
+        serviceCollection.TryAdd(new ServiceDescriptor(typeof(IMongoCollection<T>),
+            _ => mongoDatabase.GetCollection<T>(collectionName), lifetime));
+        serviceCollection.TryAdd(new ServiceDescriptor(typeof(IRepository<T>), typeof(Repository<T>), lifetime));
 
-		return serviceCollection;
-	}
+        return serviceCollection;
+    }
 }

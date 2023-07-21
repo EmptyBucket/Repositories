@@ -27,27 +27,26 @@ namespace Repositories.Abstractions.Repositories;
 
 public interface IRepository<T> where T : IExprEntity
 {
-	Task<IReadOnlyCollection<T>> GetManyAsync(Expression<Func<T, bool>>? where = null,
-		IEnumerable<Expression<Func<T, object>>>? orderBy = null, int? offset = null, int? count = null,
-		CancellationToken cancellationToken = default);
+    Task<IReadOnlyCollection<T>> GetManyAsync(Expression<Func<T, bool>>? where = null,
+        IEnumerable<Expression<Func<T, object>>>? orderBy = null, int? offset = null, int? count = null,
+        CancellationToken cancellationToken = default);
 
-	Task<T?> FindAsync(Expression<Func<T, bool>>? where = null,
-		IEnumerable<Expression<Func<T, object>>>? orderBy = null, int? offset = null, int? count = null,
-		CancellationToken cancellationToken = default);
+    Task<T?> FindAsync(Expression<Func<T, bool>>? where = null,
+        IEnumerable<Expression<Func<T, object>>>? orderBy = null, int? offset = null, int? count = null,
+        CancellationToken cancellationToken = default);
 
-	Task<T> GetAsync(Expression<Func<T, bool>>? where = null,
-		IEnumerable<Expression<Func<T, object>>>? orderBy = null, int? offset = null, int? count = null,
-		CancellationToken cancellationToken = default);
+    Task<T> GetAsync(Expression<Func<T, bool>>? where = null, IEnumerable<Expression<Func<T, object>>>? orderBy = null,
+        int? offset = null, int? count = null, CancellationToken cancellationToken = default);
 
-	Task AddAsync(T entity, CancellationToken cancellationToken = default);
+    Task AddAsync(T entity, CancellationToken cancellationToken = default);
 
-	Task AddManyAsync(IReadOnlyCollection<T> entities, CancellationToken cancellationToken = default);
+    Task AddManyAsync(IReadOnlyCollection<T> entities, CancellationToken cancellationToken = default);
 
-	Task UpdateAsync(T entity, CancellationToken cancellationToken = default);
+    Task UpdateAsync(T entity, CancellationToken cancellationToken = default);
 
-	Task UpdateManyAsync(IReadOnlyCollection<T> entities, CancellationToken cancellationToken = default);
+    Task UpdateManyAsync(IReadOnlyCollection<T> entities, CancellationToken cancellationToken = default);
 
-	Task DeleteAsync(T entity, CancellationToken cancellationToken = default);
+    Task DeleteAsync(T entity, CancellationToken cancellationToken = default);
 
-	Task DeleteManyAsync(IReadOnlyCollection<T> entities, CancellationToken cancellationToken = default);
+    Task DeleteManyAsync(IReadOnlyCollection<T> entities, CancellationToken cancellationToken = default);
 }

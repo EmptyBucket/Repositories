@@ -25,5 +25,5 @@ namespace Repositories.Scopes;
 
 internal interface IScopeHead<out TScope> where TScope : IScope<TScope>
 {
-	TScope Head { get; }
+    TScope Head { get; }
 }

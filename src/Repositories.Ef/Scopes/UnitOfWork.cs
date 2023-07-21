@@ -21,33 +21,34 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
+using Microsoft.EntityFrameworkCore;
 using Repositories.Abstractions.Scopes;
 
 namespace Repositories.Scopes;
 
 internal class UnitOfWork : IUnitOfWork
 {
-	private readonly IEnumerable<IScopeHead<IDbContextScope>> _scopeHeads;
+    private readonly IEnumerable<IScopeHead<IDbContextScope<DbContext>>> _scopeHeads;
 
-	public UnitOfWork(IEnumerable<IScopeHead<IDbContextScope>> scopeHeads)
-	{
-		_scopeHeads = scopeHeads;
-	}
+    public UnitOfWork(IEnumerable<IScopeHead<IDbContextScope<DbContext>>> scopeHeads)
+    {
+        _scopeHeads = scopeHeads;
+    }
 
-	public async Task<IUnitOfWork> RunAsync(Func<Task> func)
-	{
-		var scopes = new List<IDbContextScope>();
+    public async Task<IUnitOfWork> RunAsync(Func<Task> func)
+    {
+        var scopes = new List<IDbContextScope<DbContext>>();
 
-		try
-		{
-			scopes.AddRange(_scopeHeads.Select(h => h.Head.Begin()));
-			await func();
-		}
-		finally
-		{
-			await Task.WhenAll(scopes.Select(s => s.DisposeAsync().AsTask())).ConfigureAwait(false);
-		}
+        try
+        {
+            scopes.AddRange(_scopeHeads.Select(h => h.Head.Begin()));
+            await func();
+        }
+        finally
+        {
+            await Task.WhenAll(scopes.Select(s => s.DisposeAsync().AsTask())).ConfigureAwait(false);
+        }
 
-		return this;
-	}
+        return this;
+    }
 }

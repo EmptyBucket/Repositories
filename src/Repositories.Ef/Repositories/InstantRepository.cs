@@ -27,50 +27,50 @@ using Repositories.Abstractions.Repositories;
 namespace Repositories.Repositories;
 
 internal class InstantRepository<T, TDbContext> : RepositoryDecorator<T>
-	where T : IExprEntity
-	where TDbContext : DbContext
+    where T : IExprEntity
+    where TDbContext : DbContext
 {
-	private readonly TDbContext _dbContext;
+    private readonly TDbContext _dbContext;
 
-	public InstantRepository(IRepository<T> repository, TDbContext dbContext) : base(repository) =>
-		_dbContext = dbContext;
+    public InstantRepository(IRepository<T> repository, TDbContext dbContext) : base(repository) =>
+        _dbContext = dbContext;
 
-	public override async Task AddAsync(T entity, CancellationToken cancellationToken = default)
-	{
-		await base.AddAsync(entity, cancellationToken);
-		await _dbContext.SaveChangesAsync(cancellationToken);
-	}
+    public override async Task AddAsync(T entity, CancellationToken cancellationToken = default)
+    {
+        await base.AddAsync(entity, cancellationToken);
+        await _dbContext.SaveChangesAsync(cancellationToken);
+    }
 
-	public override async Task AddManyAsync(IReadOnlyCollection<T> entities,
-		CancellationToken cancellationToken = default)
-	{
-		await base.AddManyAsync(entities, cancellationToken);
-		await _dbContext.SaveChangesAsync(cancellationToken);
-	}
+    public override async Task AddManyAsync(IReadOnlyCollection<T> entities,
+        CancellationToken cancellationToken = default)
+    {
+        await base.AddManyAsync(entities, cancellationToken);
+        await _dbContext.SaveChangesAsync(cancellationToken);
+    }
 
-	public override async Task UpdateAsync(T entity, CancellationToken cancellationToken = default)
-	{
-		await base.UpdateAsync(entity, cancellationToken);
-		await _dbContext.SaveChangesAsync(cancellationToken);
-	}
+    public override async Task UpdateAsync(T entity, CancellationToken cancellationToken = default)
+    {
+        await base.UpdateAsync(entity, cancellationToken);
+        await _dbContext.SaveChangesAsync(cancellationToken);
+    }
 
-	public override async Task UpdateManyAsync(IReadOnlyCollection<T> entities,
-		CancellationToken cancellationToken = default)
-	{
-		await base.UpdateManyAsync(entities, cancellationToken);
-		await _dbContext.SaveChangesAsync(cancellationToken);
-	}
+    public override async Task UpdateManyAsync(IReadOnlyCollection<T> entities,
+        CancellationToken cancellationToken = default)
+    {
+        await base.UpdateManyAsync(entities, cancellationToken);
+        await _dbContext.SaveChangesAsync(cancellationToken);
+    }
 
-	public override async Task DeleteAsync(T entity, CancellationToken cancellationToken = default)
-	{
-		await base.DeleteAsync(entity, cancellationToken);
-		await _dbContext.SaveChangesAsync(cancellationToken);
-	}
+    public override async Task DeleteAsync(T entity, CancellationToken cancellationToken = default)
+    {
+        await base.DeleteAsync(entity, cancellationToken);
+        await _dbContext.SaveChangesAsync(cancellationToken);
+    }
 
-	public override async Task DeleteManyAsync(IReadOnlyCollection<T> entities,
-		CancellationToken cancellationToken = default)
-	{
-		await base.DeleteManyAsync(entities, cancellationToken);
-		await _dbContext.SaveChangesAsync(cancellationToken);
-	}
+    public override async Task DeleteManyAsync(IReadOnlyCollection<T> entities,
+        CancellationToken cancellationToken = default)
+    {
+        await base.DeleteManyAsync(entities, cancellationToken);
+        await _dbContext.SaveChangesAsync(cancellationToken);
+    }
 }

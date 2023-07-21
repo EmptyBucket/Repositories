@@ -21,10 +21,9 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-namespace Repositories.Abstractions.Scopes
+namespace Repositories.Abstractions.Scopes;
+
+public interface IUnitOfWork
 {
-	public interface IUnitOfWork
-	{
-		Task<IUnitOfWork> RunAsync(Func<Task> func);
-	}
+    Task<IUnitOfWork> RunAsync(Func<Task> func);
 }

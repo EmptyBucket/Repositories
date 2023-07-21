@@ -25,25 +25,24 @@ using Microsoft.EntityFrameworkCore;
 using Repositories.Abstractions.Repositories;
 using Repositories.Scopes;
 
-namespace Repositories.Repositories
+namespace Repositories.Repositories;
+
+internal class ScopedRepositoryFactory<T, TDbContext> : IRepositoryFactory<T>
+    where T : class, IExprEntity
+    where TDbContext : DbContext
 {
-	internal class ScopedRepositoryFactory<T, TDbContext> : IRepositoryFactory<T>
-		where T : class, IExprEntity
-		where TDbContext : DbContext
-	{
-		private readonly IScopeHead<IDbContextScope<TDbContext>> _dbContextScopeHead;
+    private readonly IScopeHead<IDbContextScope<TDbContext>> _dbContextScopeHead;
 
-		public ScopedRepositoryFactory(IScopeHead<IDbContextScope<TDbContext>> dbContextScopeHead)
-		{
-			_dbContextScopeHead = dbContextScopeHead;
-		}
+    public ScopedRepositoryFactory(IScopeHead<IDbContextScope<TDbContext>> dbContextScopeHead)
+    {
+        _dbContextScopeHead = dbContextScopeHead;
+    }
 
-		public IRepository<T> Create()
-		{
-			var head = _dbContextScopeHead.Head;
-			return head.Parent is null
-				? new InstantRepository<T, TDbContext>(new Repository<T, TDbContext>(head.DbContext), head.DbContext)
-				: new Repository<T, TDbContext>(head.DbContext);
-		}
-	}
+    public IRepository<T> Create()
+    {
+        var head = _dbContextScopeHead.Head;
+        return head.Parent is null
+            ? new InstantRepository<T, TDbContext>(new Repository<T, TDbContext>(head.DbContext), head.DbContext)
+            : new Repository<T, TDbContext>(head.DbContext);
+    }
 }

@@ -25,31 +25,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Repositories.Scopes;
 
-internal interface IDbContextScope : IScope<IDbContextScope>
+internal interface IDbContextScope<out TDbContext> : IScope<IDbContextScope<TDbContext>> where TDbContext : DbContext
 {
-	DbContext DbContext { get; }
-}
-
-internal interface IDbContextScope<out TDbContext> : IDbContextScope, IScope<IDbContextScope<TDbContext>>
-	where TDbContext : DbContext
-{
-	new TDbContext DbContext { get; }
-
-	DbContext IDbContextScope.DbContext => DbContext;
-
-	new IDbContextScope<TDbContext>? Parent { get; }
-
-	IDbContextScope? IScope<IDbContextScope>.Parent => Parent;
-
-	new IDbContextScope<TDbContext>? Child { get; }
-
-	IDbContextScope? IScope<IDbContextScope>.Child => Child;
-
-	new bool Disposed { get; }
-
-	bool IScope<IDbContextScope>.Disposed => Disposed;
-
-	new IDbContextScope<TDbContext> Begin();
-
-	IDbContextScope IScope<IDbContextScope>.Begin() => Begin();
+    TDbContext DbContext { get; }
 }

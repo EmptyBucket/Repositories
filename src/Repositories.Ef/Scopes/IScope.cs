@@ -25,11 +25,11 @@ namespace Repositories.Scopes;
 
 internal interface IScope<out TScope> : IAsyncDisposable where TScope : IScope<TScope>
 {
-	TScope? Parent { get; }
+    TScope? Parent { get; }
 
-	TScope? Child { get; }
+    TScope? Child { get; }
 
-	bool Disposed { get; }
+    bool IsDisposed { get; }
 
-	TScope Begin();
+    TScope Begin();
 }

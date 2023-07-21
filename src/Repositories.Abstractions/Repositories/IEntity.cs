@@ -27,7 +27,7 @@ namespace Repositories.Abstractions.Repositories;
 
 public interface IEntity<out TKey, T> : IExprEntity<T> where T : IEntity<TKey, T>
 {
-	TKey Id { get; }
+    TKey Id { get; }
 
-	Expression<Func<T, object>> IExprEntity<T>.IdExpr => e => e.Id!;
+    Expression<Func<T, object>> IExprEntity<T>.IdExpr => e => e.Id!;
 }

@@ -25,45 +25,45 @@ namespace Repositories.Scopes;
 
 internal class ScopeHead<TScope> : IScopeHead<TScope> where TScope : IScope<TScope>
 {
-	private TScope _scope;
+    private TScope _scope;
 
-	public ScopeHead(TScope scope)
-	{
-		_scope = scope;
-	}
+    public ScopeHead(TScope scope)
+    {
+        _scope = scope;
+    }
 
-	public TScope Head
-	{
-		get
-		{
-			var _ = TryTakeChild(ref _scope) || TryTakeParent(ref _scope);
-			return _scope;
-		}
-	}
+    public TScope Head
+    {
+        get
+        {
+            var _ = TryTakeChild(ref _scope) || TryTakeParent(ref _scope);
+            return _scope;
+        }
+    }
 
-	private static bool TryTakeChild(ref TScope scope)
-	{
-		var isSuccess = false;
+    private static bool TryTakeChild(ref TScope scope)
+    {
+        var isSuccess = false;
 
-		while (scope.Child is { Disposed: false })
-		{
-			scope = scope.Child;
-			isSuccess = true;
-		}
+        while (scope.Child is { IsDisposed: false })
+        {
+            scope = scope.Child;
+            isSuccess = true;
+        }
 
-		return isSuccess;
-	}
+        return isSuccess;
+    }
 
-	private static bool TryTakeParent(ref TScope scope)
-	{
-		var isSuccess = false;
+    private static bool TryTakeParent(ref TScope scope)
+    {
+        var isSuccess = false;
 
-		while (scope is { Disposed: true, Parent: not null })
-		{
-			scope = scope.Parent;
-			isSuccess = true;
-		}
+        while (scope is { IsDisposed: true, Parent: not null })
+        {
+            scope = scope.Parent;
+            isSuccess = true;
+        }
 
-		return isSuccess;
-	}
+        return isSuccess;
+    }
 }

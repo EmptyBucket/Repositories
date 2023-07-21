@@ -21,37 +21,18 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
+using Microsoft.EntityFrameworkCore;
+
 namespace Repositories.Scopes;
 
-internal abstract class Scope<TScope> : IScope<TScope> where TScope : IScope<TScope>
+internal class ScopedDbContextFactory<TDbContext> : IDbContextFactory<TDbContext> where TDbContext : DbContext
 {
-	protected Scope(TScope? parent)
-	{
-		Parent = parent;
-	}
+    private readonly IScopeHead<IDbContextScope<TDbContext>> _dbContextScopeHead;
 
-	public TScope? Parent { get; }
+    public ScopedDbContextFactory(IScopeHead<IDbContextScope<TDbContext>> dbContextScopeHead)
+    {
+        _dbContextScopeHead = dbContextScopeHead;
+    }
 
-	public TScope? Child { get; private set; }
-
-	public bool Disposed { get; private set; }
-
-	public TScope Begin() => Child = BeginCore();
-
-	public async ValueTask DisposeAsync()
-	{
-		if (Disposed) return;
-
-		await DisposeAsyncCore();
-		GC.SuppressFinalize(this);
-		Disposed = true;
-	}
-
-	protected abstract TScope BeginCore();
-
-	protected virtual async ValueTask DisposeAsyncCore()
-	{
-		if (Child is not null)
-			await Child.DisposeAsync();
-	}
+    public TDbContext CreateDbContext() => _dbContextScopeHead.Head.DbContext;
 }
